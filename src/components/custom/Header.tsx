@@ -9,7 +9,7 @@ import { Button } from '../ui/button'
 
 const Header = () => {
   return (
-    <header className="fixed top-0 flex justify-end items-center p-4 gap-4 h-16">
+    <header className="fixed top-0 w-full flex justify-end items-center p-4 gap-4 h-16 border-b z-50 bg-white shadow-2xs">
       <SignedOut>
         {/* this forceRedirectUrl redirect the user to its dashboard after login */}
         <SignInButton forceRedirectUrl="/dashboard"> 
