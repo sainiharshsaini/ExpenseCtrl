@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 31, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/singh/OneDrive/Desktop/Harsh-Code/Nextjs/expense-ctrl/src/app/%28auth%29/sign-up/%5B%5B...sign-up%5D%5D/page.tsx"],"sourcesContent":["import { SignUp } from '@clerk/nextjs'\r\n\r\nconst SignUpPage = () => {\r\n  return <SignUp/>\r\n}\r\n\r\nexport default SignUpPage"],"names":[],"mappings":";;;;AAAA;;;AAEA,MAAM,aAAa;IACjB,qBAAO,8OAAC,sLAAA,CAAA,SAAM;;;;;AAChB;uCAEe","debugId":null}}]
+}
