@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/singh/OneDrive/Desktop/Harsh-Code/Nextjs/expense-ctrl/src/app/%28auth%29/layout.tsx"],"sourcesContent":["import { ReactNode } from 'react'\r\n\r\ninterface AuthLayoutProps {\r\n    children: ReactNode\r\n}\r\n\r\nconst AuthLayout = ({ children }: AuthLayoutProps) => {\r\n    return (\r\n        <div className='h-screen flex justify-center items-center'>\r\n            {children}\r\n        </div>\r\n    )\r\n}\r\n\r\nexport default AuthLayout"],"names":[],"mappings":";;;;;AAMA,MAAM,aAAa,CAAC,EAAE,QAAQ,EAAmB;IAC7C,qBACI,8OAAC;QAAI,WAAU;kBACV;;;;;;AAGb;uCAEe","debugId":null}}]
-}
