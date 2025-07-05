@@ -1,11 +1,21 @@
 import { z } from "zod";
 
-export const accountSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  type: z.enum(["CURRENT", "SAVINGS"]),
-  balance: z.string().min(1, "Initial balance is required"),
+export const bankAccountSchema = z.object({
+  name: z.string().min(1, 'Account name is required').max(100, 'Account name cannot exceed 100 characters'),
+  type: z.enum(['CURRENT', 'SAVINGS'], {
+    errorMap: () => ({ message: 'Please select an account type' }),
+  }),
+  balance: z.preprocess(
+    (val) => Number(val),
+    z.number()
+      .min(0, 'Amount cannot be negative')
+      .max(1000000, 'Amount cannot exceed 1,000,000')
+      .refine(val => !isNaN(val), { message: 'Amount must be a number' })
+  ),
   isDefault: z.boolean().default(false),
 });
+
+export type BankAccountInputs = z.infer<typeof bankAccountSchema>;
 
 // export const transactionSchema = z.object({
 //     type: z.enum(["INCOME", "EXPENSE"]),

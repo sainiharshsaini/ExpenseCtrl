@@ -1,39 +1,24 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-
-const serializeTxn = (obj: any) => {
-    const serialized = { ...obj };
-
-    if (obj.balance) serialized.balance = obj.balance.toNumber();
-}
+import { serializeTxn } from "@/lib/serializers";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function createAccount(data: any) {
     try {
-        const { userId } = await auth();
-        if (!userId) throw new Error("Unauthorized");
+        const user = await getAuthenticatedUser(); // Call the common utility function to get the authenticated user.
 
-        const user = await db.user.findUnique({
-            where: { clerkUserId: userId }
-        });
-        if (!user) throw new Error("User not found");
-
-        // Convert balance into float before saving and check if the balance is number or not
-        const balanceFloat = parseFloat(data.balance);
+        const balanceFloat = parseFloat(data.balance); // Convert balance into float before saving and check if the balance is number or not
         if (isNaN(balanceFloat)) throw new Error("Invalid balance amount");
 
-        // checking how many existing accounts user have
-        const existingAccounts = await db.account.findMany({
+        const existingAccounts = await db.account.findMany({ // checking how many existing accounts user have
             where: { userId: user.id }
         })
 
-        // if user has only one existing account then make it default account
-        const shouldBeDefault = existingAccounts.length === 0 ? true : data.isDefault;
+        const shouldBeDefault = existingAccounts.length === 0 ? true : data.isDefault; // if user has only one existing account then make it default account
 
-        // if it has only single account then i making it default by default but not sending it from data
-        if (shouldBeDefault) {
+        if (shouldBeDefault) { // if it has only single account then i making it default by default but not sending it from data
             await db.account.updateMany({
                 where: { userId: user.id, isDefault: true },
                 data: { isDefault: false }
@@ -49,11 +34,9 @@ export async function createAccount(data: any) {
             }
         })
 
-        // nextjs doesn't support the decimal value so, before sending it to nextjs we need to serialize its value
-        const serializedAccount = serializeTxn(account);
+        const serializedAccount = serializeTxn(account); // nextjs doesn't support the decimal value so, before sending it to nextjs we need to serialize its value
 
-        // it will basically help to re-fetch the value of the page
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard"); // it will basically help to re-fetch the value of the page
         return { success: true, data: serializedAccount };
 
     } catch (error) {
@@ -63,4 +46,37 @@ export async function createAccount(data: any) {
             console.error("An unknown error occured:", error)
         }
     }
+}
+
+export async function getUserAccounts() {
+    const user = await getAuthenticatedUser();
+
+    try {
+        const userBankAccounts = await db.account.findMany({
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" },
+            include: {
+                _count: {
+                    select: {
+                        transactions: true,
+                    },
+                },
+            },
+        });
+
+        const serializedUserBankAccounts = userBankAccounts.map(serializeTxn);
+
+        return serializedUserBankAccounts;
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("An error occurred:", error.message)
+        } else {
+            console.error("An unknown error occured:", error)
+        }
+    }
+}
+
+export async function getDashboardData() {
+
 }
