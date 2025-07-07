@@ -48,7 +48,7 @@ export async function createAccount(data: any) {
     }
 }
 
-export async function getUserAccounts() {
+export async function getUserBankAccounts() {
     const user = await getAuthenticatedUser();
 
     try {
