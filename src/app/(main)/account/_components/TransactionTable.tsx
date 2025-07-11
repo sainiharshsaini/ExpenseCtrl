@@ -2,12 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import {
-  ChevronDown,
-  ChevronUp,
   MoreHorizontal,
-  Trash,
-  Search,
-  X,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -24,14 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,10 +38,10 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { bulkDeleteTransactions } from "@/actions/accounts";
 import useFetch from "@/hooks/usefetch";
-import { BarLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import TxnTableHead from "./TxnTableHead";
 import { categoryColors } from "@/data/categories";
+import FilterTable from "./FilterTable";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -130,6 +117,7 @@ export function TransactionTable({ transactions }: any) {
   const totalPages = Math.ceil(
     filteredAndSortedTransactions.length / ITEMS_PER_PAGE
   );
+  
   const paginatedTransactions = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredAndSortedTransactions.slice(
@@ -148,18 +136,13 @@ export function TransactionTable({ transactions }: any) {
 
   const handleSelect = (id: any) => {
     setSelectedIds((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
     );
   };
 
   const handleSelectAll = () => {
     setSelectedIds((current) =>
-      current.length === paginatedTransactions.length
-        ? []
-        : paginatedTransactions.map((t) => t.id)
-    );
+      current.length === paginatedTransactions.length ? [] : paginatedTransactions.map((t) => t.id));
   };
 
   const {
@@ -185,13 +168,6 @@ export function TransactionTable({ transactions }: any) {
     }
   }, [deleted, deleteLoading]);
 
-  const handleClearFilters = () => {
-    setSearchTerm("");
-    setTypeFilter("");
-    setRecurringFilter("");
-    setCurrentPage(1);
-  };
-
   const handlePageChange = (newPage: any) => {
     setCurrentPage(newPage);
     setSelectedIds([]); // Clear selections on page change
@@ -199,81 +175,8 @@ export function TransactionTable({ transactions }: any) {
 
   return (
     <div className="space-y-4">
-      {deleteLoading && <BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
-
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="pl-8"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Select
-            value={typeFilter}
-            onValueChange={(value) => {
-              setTypeFilter(value);
-              setCurrentPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder="All Types" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="INCOME">Income</SelectItem>
-              <SelectItem value="EXPENSE">Expense</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={recurringFilter}
-            onValueChange={(value) => {
-              setRecurringFilter(value);
-              setCurrentPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder="All Transactions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recurring">Recurring Only</SelectItem>
-              <SelectItem value="non-recurring">Non-recurring Only</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Bulk Actions */}
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Delete Selected ({selectedIds.length})
-              </Button>
-            </div>
-          )}
-
-          {(searchTerm || typeFilter || recurringFilter) && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleClearFilters}
-              title="Clear filters"
-            >
-              <X className="h-4 w-5" />
-            </Button>
-          )}
-        </div>
-      </div>
+      <FilterTable searchTerm={searchTerm} setSearchTerm={setSearchTerm} setCurrentPage={setCurrentPage} typeFilter={typeFilter} setTypeFilter={setTypeFilter} recurringFilter={recurringFilter} setRecurringFilter={setRecurringFilter} selectedIds={selectedIds} handleBulkDelete={handleBulkDelete} deleteLoading={deleteLoading}/>
 
       {/* Transactions Table */}
       <div className="rounded-md border">
